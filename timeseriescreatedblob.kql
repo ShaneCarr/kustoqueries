@@ -1,0 +1,89 @@
+dropwizard 
+//| where env != "stage"
+| where service == "filemigration"
+//| where log_timestamp > datetime(2019-09-16 18:56:02.0000000)
+//| where log_timestamp < datetime(2019-09-17 9:56:02.0000000)
+//| where correlation_id =="3a04b0f4-11c6-42d1-8dbe-d0960b945f16"
+| where message contains "created blob" or message contains "created buffered stream" or  message contains "created buffered stream" or  message contains "got media type"
+
+//| where message contains "19390464"
+//| where message contains "19390464"
+//| where message contains "Migration begins for request"
+//| where message contains 'timeout'
+//| where stack_trace  != ""
+| order by log_timestamp desc 
+
+
+[10002100532, nb:cid:UUID:25800c2a-e576-46d2-b730-0e0ae1c3024a, .jpg] created blob
+[10132200498, nb:cid:UUID:25800c2a-e576-46d2-b730-0e0ae1c3024a, .jpg] created buffered stream
+
+;
+dropwizard 
+//| where env != "stage"
+| where service == "fileville"
+| where log_timestamp > datetime(2019-09-16 18:56:02.0000000)
+| where log_timestamp < datetime(2019-09-17 9:56:02.0000000)
+| where message contains "created blob"
+|where logger_name contains "azuremedia"
+| project split(message, ",")
+
+
+dropwizard 
+//| where env != "stage"
+| where service == "fileville"
+| where TIMESTAMP > ago (10d)
+//| top 1 by TIMESTAMP
+| where log_timestamp > datetime(2019-09-16 18:56:02.0000000)
+| where log_timestamp < datetime(2019-09-17 9:56:02.0000000)
+    // | where message contains "25800c2a-e576-46d2-b730-0e0ae1c3024a" // streamid
+|where logger_name contains "azuremedia"
+ | where message contains "created blob" /// or message contains "created buffered stream" or  message contains "got media type" or  message contains "got media type" or  message  contains "getObject begin" or message contains "got blob response"  or message contains "getAzureMediaURIWithAssetId" or message contains "listAmsOperation completed for uri"
+| where docker_host == "10.26.209.137"
+
+
+
+dropwizard 
+| where service == "fileville"
+| where TIMESTAMP > ago (10d)
+| extend day=datetime_part("Day", (log_timestamp))
+|summarize day_Count=count() by day,cell
+| sort by day asc
+| render timechart  with(series=day,day_Count)
+
+dropwizard 
+| where service == "fileville"
+| where TIMESTAMP > ago (6d)
+| where message contains "created blob" 
+| top 1 by TIMESTAMP
+
+dropwizard 
+| where service == "fileville"
+| where TIMESTAMP > ago (25d)
+| where message contains "created blob" /// or message contains "created buffered stream" or  message contains "got media type" or  message contains "got media type" or  message  contains "getObject 
+| where logger_name =="com.yammer.fileville.clients.AzureMediaClient"
+| extend day=datetime_part("Day", (log_timestamp))
+| extend month=datetime_part("Month", (log_timestamp))
+|summarize day_Count=count() by month,day,cell
+| sort by day asc
+| render timechart  with(series=day,day_Count)
+
+
+|project format_datetime(log_timestamp,"%Y-%m-%d")
+|project format_datetime(todatetime(log_timestamp), "%Y-%m-%d")
+
+//| summarize blobCount=count() by bin(dateTime(TIMESTAMP), 1s)
+
+
+
+getAzureMediaURIWithAssetId
+
+
+[1006119613, nb:cid:UUID:6af67691-265b-499f-8c05-b17bcb1b41e1, .jpg] created blob
+
+[559121319, nb:cid:UUID:dcdc27e8-f6f1-4b6e-a344-cf741ceabf81, .jpg] created blob
+
+[10002100532, nb:cid:UUID:25800c2a-e576-46d2-b730-0e0ae1c3024a, .jpg] created blob
+
+
+
+
